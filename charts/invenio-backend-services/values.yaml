@@ -1,0 +1,68 @@
+cn-pg:
+  certs:
+    issuerRef:
+      name: ca-cluster-issuer
+      kind: ClusterIssuer
+      group: cert-manager.io
+  cluster:
+    name: "nma"
+    instances: 3    
+    logLevel: info
+    resources:
+      limits:
+        memory: "2048Mi"
+        cpu: "2.0"
+    storage:
+      size: 50Gi
+    walStorage:
+      size: 50Gi
+    bootstrap:
+      initdb:
+        database: eosccz_repo_nma_test 
+        owner: eosccz_repo_nma_test
+    backup:
+      barmanObjectStore:
+        destinationPath: "s3://test/backup/cn-pg-testing-nma/"
+        endpointURL: "https://s3.be.du.cesnet.cz"
+redis:
+  passwordLength: 64
+  architecture: standalone
+  auth:
+    enabled: true
+    existingSecret: blabla-bleble-neco-neco-backend-services-redis 
+    existingSecretPasswordKey: redisPassword
+    existing_secret: true
+    secret_name: blabla-bleble-neco-neco-backend-services-redis
+    secret_key: redisPassword 
+  metrics:
+    enabled: false
+opensearch:
+  singleNode: true
+  opensearchJavaOpts: "-Xmx4096M -Xms4096M"
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "6Gi"
+    limits:
+      cpu: "1500m"
+      memory: "6Gi"
+  extraEnvs:
+    - name: DISABLE_INSTALL_DEMO_CONFIG
+      value: "true"
+    - name: DISABLE_SECURITY_PLUGIN
+      value: "true"
+  plugins:
+    enabled: true
+    installList:
+    - analysis-icu
+rabbitmq:
+  commonAnnotations:
+    version/values: 1.0.0
+  passwordLength: 64
+  erlangCookieLength: 128
+  auth:
+    username: user
+    existingPasswordSecret: blabla-bleble-neco-neco-backend-services-rabbitmq 
+    existingSecretPasswordKey: rabbitmqPassword
+    existingErlangSecret: blabla-bleble-neco-neco-backend-services-rabbitmq
+    existingSecretErlangKey: rabbitmqErlangCookie

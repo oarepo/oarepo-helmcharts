@@ -1,0 +1,10 @@
+apiVersion: v2
+name: cn-pg
+description: Chart creates a postgresql cluster via a cloud native postgresql operator
+type: application
+version: 0.3.1
+appVersion: "16"
+dependencies:
+  - name: common
+    repository: oci://hub.cerit.io/steiner/helm-charts 
+    version: 0.7.3

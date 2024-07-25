@@ -1,0 +1,9 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: {{ include "common.fullname" . -}}-{{- required "\n\n.Values.cluster.scheduledBackup.nameSuffix\nby default contains `scheduled-backup`" .Values.cluster.scheduledBackup.nameSuffix }}
+spec:
+  schedule: {{ required "\n\n.Values.cluster.scheduledBackup.schedule\nby default contains 25 24 23 * * *" .Values.cluster.scheduledBackup.schedule }} 
+  backupOwnerReference: self
+  cluster: 
+    name: {{ include "common.fullname" . }} 

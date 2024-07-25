@@ -1,0 +1,21 @@
+{{ template "chart.header" . }}
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.requirementsHeader" . }}
+
+## required k8s components 
+
+* cloudnative postgresql operator **[cn-pg github](https://github.com/cloudnative-pg/cloudnative-pg)**
+* cloudnative cert-manager **[cert-manager github](https://github.com/cert-manager/cert-manager)**
+* any CSI driver
+
+## helm dependencies
+
+{{ template "chart.requirementsTable" . }}
+
+
+{{ template "chart.valuesHeader" . }}
+
+* as a best practice use for S3 secret values another values file
+
+{{ template "chart.valuesTable" . }}

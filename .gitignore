@@ -1,0 +1,5 @@
+arc/
+**/*.tgz
+**/*.lock
+tmp/
+pythonvenv/

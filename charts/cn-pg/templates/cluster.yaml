@@ -1,0 +1,70 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ include "common.fullname" . }}
+  labels:
+    {{- include "common.labels" . | nindent 4 }}
+spec:
+  instances: {{ required  "\nNumber of cluster nodes. \nSpecify in : .Values.cluster.instances\n" .Values.cluster.instances }} 
+  {{- if .Values.cluster.minSyncReplicas }}
+  minSyncReplicas: {{ .Values.cluster.minSyncReplicas }}
+  {{- end }}
+  {{- if .Values.cluster.maxSyncReplicas }}
+  maxSyncReplicas: {{ .Values.cluster.maxSyncReplicas }}
+  {{- end }}
+  resources:
+    requests:
+      memory: {{ required "You have to set .Values.cluster.resources.requests.memory\n" .Values.cluster.resources.requests.memory }}
+      cpu: {{ required "You have to set .Values.cluster.resources.requests.cpu\n" .Values.cluster.resources.requests.cpu }}
+    limits:
+      memory: {{ required "You have to set .Values.cluster.resources.limits.memory\n" .Values.cluster.resources.limits.memory }}
+      cpu: {{ required "You have to set .Values.cluster.resources.limits.cpu\n" .Values.cluster.resources.limits.cpu }}
+  storage:
+    size: {{ required "You have to set .Values.cluster.storage.size\n" .Values.cluster.storage.size }} 
+    {{- if .Values.cluster.storage.storageClass }}
+    storageClass: {{ .Values.cluster.storage.storageClass }}
+    {{- end }}
+  walStorage:
+    size: {{ required "You have to set .Values.cluster.walStorage.size\n" .Values.cluster.walStorage.size }} 
+    {{- if .Values.cluster.walStorage.storageClass }}
+    storageClass: {{ .Values.cluster.walStorage.storageClass }}
+    {{- end }}
+  certificates: 
+    serverTLSSecret: {{ include "common.fullname" . -}}-{{ .Values.certs.server.secretSuffix }} 
+    serverCASecret: {{ include "common.fullname" . -}}-{{ .Values.certs.server.secretSuffix }} 
+    replicationTLSSecret: {{ include "common.fullname" . -}}-{{ .Values.certs.client.secretSuffix }} 
+    clientCASecret: {{ include "common.fullname" . -}}-{{ .Values.certs.client.secretSuffix }} 
+  {{- include "cn-pg.cluster.postgresql.params" . | indent 2 }}
+  bootstrap:
+    initdb:
+      database: {{ required "\nYou have to set .Values.cluster.bootstrap.initdb.database\n" .Values.cluster.bootstrap.initdb.database }}
+      owner: {{ required "\nYou have to set .Values.cluster.bootstrap.initdb.owner\n" .Values.cluster.bootstrap.initdb.owner }}
+      dataChecksums: {{ required "\nYou have to set true|false .Values.cluster.bootstrap.initdb.dataChecksums" .Values.cluster.bootstrap.initdb.dataChecksums }}
+      encoding: {{ required "\nYou have to set .Values.cluster.bootstrap.initdb.encoding\n" .Values.cluster.bootstrap.initdb.encoding }}
+      {{- if .Values.cluster.bootstrap.initdb.localeCollate }}
+      localeCollate: {{ .Values.cluster.bootstrap.initdb.localeCollate }}
+      {{- end }}
+      {{- if .Values.cluster.bootstrap.initdb.localeCType }}
+      localeCType: {{ .Values.cluster.bootstrap.initdb.localeCType }}
+      {{- end }}
+      {{- if .Values.cluster.bootstrap.initdb.walSegmentSize}}
+      walSegmentSize: {{ .Values.cluster.bootstrap.initdb.walSegmentSize}}
+      {{- end }}
+  backup:
+    retentionPolicy: {{ required "\nbackups retention in days, weeks or months .Values.cluster.backup.retentionPolicy" .Values.cluster.backup.retentionPolicy }}
+    barmanObjectStore:
+      destinationPath: {{ required "\nset S3 bucket name, optionally some subpath in\n.Values.cluster.backup.barmanObjectStore.destinationPath " .Values.cluster.backup.barmanObjectStore.destinationPath   }}
+      endpointURL: {{ required "\nset S3 endpoint in \n.Values.cluster.backup.barmanObjectStore.endpointURL" .Values.cluster.backup.barmanObjectStore.endpointURL }}
+      s3Credentials: 
+        {{- include "cn-pg.barmanobjectstore.s3" . }}
+      {{- if .Values.cluster.backup.barmanObjectStore.wal }}
+      wal:
+        compression: {{ required "\n\n.Values.cluster.backup.barmanObjectStore.wal.compression " .Values.cluster.backup.barmanObjectStore.wal.compression }}
+        maxParallel: {{ required "\n\n.Values.cluster.backup.barmanObjectStore.wal.maxParallel " .Values.cluster.backup.barmanObjectStore.wal.maxParallel }}
+      {{- end }}
+      {{- if .Values.cluster.backup.barmanObjectStore.data }}
+      data:
+        compression: {{ required "\n\n.Values.cluster.backup.barmanObjectStore.data.compression " .Values.cluster.backup.barmanObjectStore.data.compression }}
+        immediateCheckpoint: {{ required "\n\n.Values.cluster.backup.barmanObjectStore.data.immediateCheckpoint" .Values.cluster.backup.barmanObjectStore.data.immediateCheckpoint }}
+      {{- end }}
+

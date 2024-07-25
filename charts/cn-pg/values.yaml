@@ -1,0 +1,204 @@
+# -- use for secret values extra file
+# @default -- none 
+# @section -- S3 config
+s3:
+  # -- If set to true, cluster use external s3 config
+  # @default -- false
+  # @section -- S3 config
+  useExternalSecret: false
+  # -- If a `useExternalSecret` is set to `true` you need to set `secretName`
+  # @section -- S3 config
+  externalSecretName: 
+  # -- please fill right accessKeyId
+  # @default -- `accessKeyId`
+  # @section -- S3 config
+  accessKeyId: aksdfjasdjkfcsadnas
+  # -- please fill right secretAccessKey 
+  # @default -- `secretAccessKey`
+  # @section -- S3 config
+  secretAccessKey: asdljkfhcnfshdalcaskj
+  # -- please fill right region, content depends on S3 provider
+  # @default -- region
+  # @section -- S3 config
+  region: region
+  # -- please fill right id, key, region and endpoint
+  # @section -- S3 config
+  s3EndpointUrl: "https://s3.endpoint.my.domain/"
+  # -- suffix for cretaed secret
+  # @default -- s3-keys
+  # @section -- S3 config
+  secretNameSuffix: "s3-keys"
+certs:
+  issuerRef:
+    # -- name of the issuer or cluster issuer
+    # @default -- you have to set your own issuer
+    # @section -- Certs issuer settings depends on `cert-manager.io`
+    name: ca-cluster-issuer
+    # -- You have to choose from two options
+    # @default -- `Issuer` or `ClusterIssuer`
+    # @section -- Certs issuer settings depends on `cert-manager.io`
+    kind: ClusterIssuer
+    # -- set to cert-manager.io
+    # @section -- Certs issuer settings depends on `cert-manager.io`
+    # @default -- `cert-manager.io`
+    group: cert-manager.io
+  server:
+    # -- secret's name suffix. secret full name would be releasename-cn-pg-secretSuffix
+    # @default -- `server-cert`
+    # @section -- Certs settings
+    secretSuffix: "server-cert"
+    # -- Cert's duration
+    # @default -- `26280h`
+    # @section -- Certs settings
+    duration: "26280h"
+    # -- Cert's renew,  usually 30d
+    # @default -- `720h`
+    # @section -- Certs settings
+    renewBefore: "720h"
+    # -- purpose of the cert
+    # @default -- `server auth`
+    # @section -- Certs settings
+    usages:
+      - server auth
+  client:
+    # -- secret's name suffix. secret full name would be releasename-cn-pg-secretSuffix
+    # @default -- `client-cert`
+    # @section -- Certs settings
+    secretSuffix: "client-cert"
+    # -- Cert's duration
+    # @default -- `26280h`
+    # @section -- Certs settings
+    duration: "26280h"
+    # -- Cert's renew,  usually 30d
+    # @default -- `720h`
+    # @section -- Certs settings
+    renewBefore: "720h"
+    # -- purpose of the cert
+    # @default -- `client auth`
+    # @section -- Certs settings
+    usages:
+      - client auth
+    # -- client CN, default is required by cn-pg operator
+    # @default -- `streaming_replica`
+    # @section -- Certs settings
+    commonName: streaming_replica
+
+cluster:
+  # -- 
+  # @default -- 
+  # @section -- Cluster
+  instances: 3
+  # -- 
+  # @default -- 
+  # @section -- Cluster
+  minSyncReplicas: 1 
+  # -- 
+  # @default -- 
+  # @section -- Cluster
+  maxSyncReplicas: 2
+  storage:
+    # -- provisioned disk size for PGDATA
+    # @default -- 50GB
+    # @section -- Cluster storage  
+    size: 50Gi
+    # cluster.storage.storageClass -- if present set storage class
+    # @default -- `storageclass name`
+    # @section -- Cluster storage
+    storageClass: 
+  walStorage: 
+    # -- provisioned disk size for WALS 
+    # @default -- 50GB
+    # @section -- Cluster storage  
+    size: 50Gi
+    # cluster.walStorage.storageClass -- if present set storage class
+    # @default -- `storageclass name`
+    # @section -- Cluster storage
+    storageClass: 
+  resources:
+    requests:
+      # -- requested RAM
+      # @default -- `512Mi`
+      # @section -- Cluster resources
+      memory: "512Mi"
+      # -- requested CPU
+      # @section -- Cluster resources
+      cpu: "50m"
+    limits:
+      # -- limit RAM
+      # @section -- Cluster resources
+      memory: "1024Mi"
+      # -- limit CPU
+      # @section -- Cluster resources
+      cpu: "1.0"
+  bootstrap:
+    initdb:
+      # -- enable segment checksums
+      # @default -- true
+      # @section -- Cluster bootstrap
+      dataChecksums: true
+      # -- encoding for entire cluster
+      # @default -- UTF8
+      # @section -- Cluster bootstrap
+      encoding: "UTF8"
+      # -- you have to create db, this is right place
+      # @default - none, you have your own db
+      # @section -- Cluster bootstrap
+      database: example_db
+      # -- db owner. 
+      # @default - none, you have to set any name you need.
+      # @section -- Cluster bootstrap
+      owner: example_user
+      # -- collation, 
+      # @default -- `C`
+      # @section -- Cluster bootstrap
+      localeCollate: "C"
+      # -- CType
+      # @default -- `C`
+      # @section -- Cluster bootstrap
+      localeCType: "C"
+      # -- size of wal files
+      # @default -- 16MB
+      # @section -- Cluster bootstrap
+      walSegmentSize: 16
+  backup:
+    # -- retention policy for backup and wals
+    # @default -- none
+    # @section -- Cluster backup
+    retentionPolicy: "90d"
+    barmanObjectStore:
+      # -- bucket name and optionally subpath
+      # @default -- none
+      # @section -- Cluster backup
+      destinationPath: "s3://bucket/some/path/"
+      # -- S3 endpoint https address 
+      # @default -- none
+      # @section -- Cluster backup
+      endpointURL: "https://s3.endpoint.url"
+      wal:
+        # -- set archivelog compression
+        # @default -- none, usually set to bzip2
+        # @section -- Cluster backup
+        compression: bzip2
+        # -- set archivelog parallelism
+        # @default -- 1
+        # @section -- Cluster backup
+        maxParallel: 2
+      data:
+        # -- basebackup  compression
+        # @default -- usually set to bzip2
+        # @section -- Cluster backup
+        compression: bzip2
+        # -- if immediate checkpoit is set 
+        # @default -- false
+        # @section -- Cluster backup
+        immediateCheckpoint: false
+  scheduledBackup:
+    # -- name suffix of your backup job
+    # @default -- scheduled-backup
+    # @section - Cluster scheduled backup
+    nameSuffix: scheduled-backup
+    # -- It's cn-pg object and is distinct from Kubernetes CronJob
+    # -- cn-pg ScheduledBackup starts with seconds!
+    # @default -- "25 24 23 * * *"
+    # @section - Cluster scheduled backup
+    schedule: "25 24 23 * * *"

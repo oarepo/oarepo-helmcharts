@@ -1,0 +1,22 @@
+apiVersion: v2
+name: backend-services 
+description: A Helm chart for Kubernetes
+type: application
+version: 0.2.2
+appVersion: 1.16.0
+dependencies:
+  - name: redis
+    version: 19.5.0
+    repository: https://charts.bitnami.com/bitnami
+  - name: opensearch
+    version: 2.20.0
+    repository: https://opensearch-project.github.io/helm-charts/
+  - name: rabbitmq
+    version: 14.3.1
+    repository: https://charts.bitnami.com/bitnami
+  - name: common
+    repository: oci://hub.cerit.io/steiner/helm-charts 
+    version: 0.5.1
+  - name: cn-pg 
+    repository: oci://hub.cerit.io/steiner/helm-charts 
+    version: 0.3.1
